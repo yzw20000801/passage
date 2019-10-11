@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace 对应的是接口的全名 -->
+<mapper namespace="com.bw.mapper.StudentMapperDao">
+
+	<select id="findlist"  parameterType="map"  resultType="map">
+		SELECT f.*,GROUP_CONCAT(l.cname) cnames from `first` f LEFT JOIN middle m on f.bid=m.bid LEFT JOIN last l on m.cid=l.cid 
+		<where>
+		<if test="bname !=null and bname != '' ">
+			and  f.bname like concat('%',#{bname},'%')
+		</if>
+		</where>
+		GROUP BY f.bname
+	</select>
+	
+	<delete id="deleteFirst"  parameterType="int" >
+		delete from first where bid=#{bid}
+	</delete>
+	
+	<delete id="deleteMiddle"  parameterType="int" >
+		delete from middle where bid=#{bid}
+	</delete>
+	
+	<select id="findtype"  resultType="last">
+		select * from last
+	</select>
+	
+	<insert id="addFirst" parameterType="map" >
+		insert into first
+		(bname,age) values
+		(#{bname},#{age})
+	</insert>
+	
+	<select id="findbid" resultType="int">
+		select max(bid)  from first 
+	</select>
+	
+	<insert id="addMiddle" parameterType="map">
+		insert into middle (bid,cid) values 
+		<foreach collection="cids" item="cid" separator=",">
+			(#{bid},#{cid})
+		</foreach>
+	</insert>
+	
+	<select id="getFirst"  parameterType="int"  resultType="first">
+		select * from first where bid=#{bid}
+	</select>
+	
+	<select id="getcids"  parameterType="int"  resultType="int">
+		select cid from middle where bid=#{bid}
+	</select>
+	
+	<update id="update"  parameterType="map" >
+		update first set bname=#{bname},age=#{age} where bid=#{bid}
+	</update>
+</mapper>
